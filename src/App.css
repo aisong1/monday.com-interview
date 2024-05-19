@@ -10,3 +10,27 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+#form-wrapper {
+  display: block;
+  width: 85%;
+}
+
+#form-wrapper div {
+}
+
+#inputs {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  column-gap: 20px;
+}
+
+#dropdown {
+  margin-top: 1em;
+}
+
+#startOrderButton {
+  width: 100%;
+  margin-top: 1em;
+}
