@@ -76,7 +76,7 @@ const App = () => {
         </div>
         <div id="startOrderButton" size="large">
           <Button onClick={handleStartOrderOnClick}>
-            Start Order
+            Start order
           </Button>
         </div>
       </div>
