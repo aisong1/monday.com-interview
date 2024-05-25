@@ -3,7 +3,6 @@ const models = require('../models');
 module.exports = {
   get: async (req, res) => {
     try {
-      console.log(req);
       const results = await models.fragrances.getAll();
       res.send(JSON.stringify(results));
     } catch (err) {
@@ -12,9 +11,8 @@ module.exports = {
   },
   post: async (req, res) => {
     try {
-      console.log(req);
       const results = await models.fragrances.create(req.body);
-      console.log(results);
+      res.status(201);
       res.send(JSON.stringify(results));
     } catch (err) {
       throw new Error(err);
@@ -23,13 +21,11 @@ module.exports = {
   // idempotent
   put: async (req, res) => {
     try {
-      console.log(req);
       const results = await models.fragrances.update(
         req.query?.id,
         ...Object.keys(req.body),
         ...Object.values(req.body),
       );
-      console.log(results);
       res.send(JSON.stringify(results));
     } catch (err) {
       throw new Error(err);
@@ -37,9 +33,7 @@ module.exports = {
   },
   delete: async (req, res) => {
     try {
-      console.log(req);
       const results = await models.fragrances.delete(req.query?.id);
-      console.log(results);
       res.send(JSON.stringify(results));
     } catch (err) {
       throw new Error(err);
