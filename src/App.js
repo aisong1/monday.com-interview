@@ -1,27 +1,67 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import "./App.css";
-import mondaySdk from "monday-sdk-js";
 import "monday-ui-react-core/dist/main.css";
 import { Button, Dropdown, TextField } from "monday-ui-react-core";
-
-// Usage of mondaySDK example, for more information visit here: https://developer.monday.com/apps/docs/introduction-to-the-sdk/
-const monday = mondaySdk();
+import axios from "axios";
 
 const handleStartOrderOnClick = () => { console.log('clicked!') };
 
 const App = () => {
-  const [context, setContext] = useState();
+  const [fragranceOptions, setFragranceOptions] = useState([]);
+  const [currentOrder, setCurrentOrder] = useState(new Map());
+
+  const onFragranceSelect = (fragrance) => {
+    setCurrentOrder((currentOrder) => {
+      console.log(`Adding ${fragrance} to order`);
+      currentOrder.set(fragrance, 0);
+      for (const [k, v] of currentOrder.entries()) {
+        console.log(k, v);
+      }
+      return currentOrder;
+    });
+  };
+
+  const onFragranceRemove = (fragrance) => {
+    setCurrentOrder((currentOrder) => {
+      console.log(`Removing ${fragrance} from order`);
+      currentOrder.delete(fragrance);
+      for (const [k, v] of currentOrder.entries()) {
+        console.log(k, v);
+      }
+      return currentOrder;
+    });
+  };
+
+  const onFragranceClear = () => {
+    setCurrentOrder(new Map());
+    console.log('Order cleared!');
+  };
+
+  const fetchAllFragrances = async () => {
+    try {
+      const results = await axios.get('http://localhost:8080/api/fragrances');
+      if (results.data) {
+        setFragranceOptions(results.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const formatFragranceOptions = () => {
+    if (fragranceOptions.length < 1) return [];
+    let count = 1;
+    return fragranceOptions.map((fragrance) => {
+      return {
+        label: fragrance.name,
+        value: count++,
+      };
+    });
+  }
 
   useEffect(() => {
-    // Notice this method notifies the monday platform that user gains a first value in an app.
-    // Read more about it here: https://developer.monday.com/apps/docs/mondayexecute#value-created-for-user/
-    monday.execute("valueCreatedForUser");
-
-    // TODO: set up event listeners, Here`s an example, read more here: https://developer.monday.com/apps/docs/mondaylisten/
-    monday.listen("context", (res) => {
-      setContext(res.data);
-    });
+    fetchAllFragrances();
   }, []);
 
   return (
@@ -44,35 +84,10 @@ const App = () => {
             multiline
             clearable
             size="large"
-            onOptionSelect={(opt) => {console.log(opt)}}
-            onOptionRemove={(opt) => {console.log(opt)}}
-            onClear={() => { console.log('options cleared') }}
-            options={[
-              {
-                label: 'Option 1',
-                value: 1
-              },
-              {
-                label: 'Option 2',
-                value: 2
-              },
-              {
-                label: 'Option 3',
-                value: 3
-              },
-              {
-                label: 'Option 4',
-                value: 4
-              },
-              {
-                label: 'Option 5',
-                value: 5
-              },
-              {
-                label: 'Option 6',
-                value: 6
-              }
-            ]}></Dropdown>
+            onOptionSelect={(option) => onFragranceSelect(option)}
+            onOptionRemove={(option) => onFragranceRemove(option)}
+            onClear={() => onFragranceClear()}
+            options={formatFragranceOptions()}></Dropdown>
         </div>
         <div id="startOrderButton" size="large">
           <Button onClick={handleStartOrderOnClick}>
