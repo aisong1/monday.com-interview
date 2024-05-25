@@ -1,3 +1,7 @@
+/*  Execute this file from the command line by typing:
+ *    mysql -u root < server/db/schema.sql
+ *  to create the database and the tables.*/
+
 DROP DATABASE IF EXISTS candleOrders;
 CREATE DATABASE candleOrders;
 
@@ -8,27 +12,26 @@ CREATE TABLE fragrances (
   name        VARCHAR(255) NOT NULL,
   description VARCHAR(255) NOT NULL,
   category    VARCHAR(255) NOT NULL,
-  created_at  DATETIME NOT NULL,
-  updated_at  DATETIME NOT NULL,
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   image_url   VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE orders (
-  id         INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  first_name VARCHAR(255) NOT NULL,
-  last_name  VARCHAR(255) NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL
+  id                  VARCHAR(255) NOT NULL PRIMARY KEY,
+  first_name          VARCHAR(255) NOT NULL,
+  last_name           VARCHAR(255) NOT NULL
+  -- Does the *order* need to care about the following?
+  -- sales_associate     VARCHAR(255),
+  -- inscription_request VARCHAR(255),
+  -- board_id            INT,
+  -- group_id            VARCHAR(255)
 );
 
 CREATE TABLE orders_fragrances (
-  id          INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  orderId     INT NOT NULL,
-  fragranceId VARCHAR(255) NOT NULL,
-  FOREIGN KEY (orderId) REFERENCES orders (id),
-  FOREIGN KEY (fragranceId) REFERENCES fragrances (id)
+  order_id     VARCHAR(255) NOT NULL,
+  fragrance_id VARCHAR(255) NOT NULL,
+  FOREIGN KEY (order_id) REFERENCES orders (id),
+  FOREIGN KEY (fragrance_id) REFERENCES fragrances (id),
+  PRIMARY KEY (order_id, fragrance_id)
 );
-
-/*  Execute this file from the command line by typing:
- *    mysql -u root < server/db/schema.sql
- *  to create the database and the tables.*/
