@@ -1,19 +1,28 @@
-const mysql = require('mysql');
+const mysql = require('mysql2/promise');
 
-const dbConnection = mysql.createConnection({
-  user: 'root',
-  password: '',
-});
+const createConnection = async () => {
+  return await mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    database: 'candleOrders',
+  });
+};
 
-dbConnection.connect((err) => {
-  if (err) {
-    console.error('Error connecting to mysql server: ' + err.stack);
-    return;
-  }
+module.exports = {
+  connection: {
+    query: async (sql) => {
+      const conn = await createConnection();
+      const [rows, fields] = await conn.query(sql);
+      await conn.end();
 
-  if (dbConnection.threadId) {
-    console.log('Connection established. Connection ID: ' + dbConnection.threadId);
-  }
-});
+      return [rows, fields];
+    },
+    execute: async (sql, values) => {
+      const conn = await createConnection();
+      const [rows, fields] = await conn.execute(sql, values);
+      await conn.end();
 
-module.exports.dbConnection = dbConnection;
+      return [rows, fields];
+    },
+  },
+};
