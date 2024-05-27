@@ -20,12 +20,11 @@ CREATE TABLE fragrances (
 CREATE TABLE orders (
   id                  VARCHAR(255) NOT NULL PRIMARY KEY,
   first_name          VARCHAR(255) NOT NULL,
-  last_name           VARCHAR(255) NOT NULL
-  -- Does the *order* need to care about the following?
-  -- sales_associate     VARCHAR(255),
-  -- inscription_request VARCHAR(255),
-  -- board_id            INT,
-  -- group_id            VARCHAR(255)
+  last_name           VARCHAR(255) NOT NULL,
+  sales_associate     VARCHAR(255),
+  inscription_request VARCHAR(255),
+  board_id            INT,
+  group_id            VARCHAR(255)
 );
 
 CREATE TABLE orders_fragrances (
