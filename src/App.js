@@ -9,32 +9,29 @@ const handleStartOrderOnClick = () => { console.log('clicked!') };
 
 const App = () => {
   const [fragranceOptions, setFragranceOptions] = useState([]);
-  const [currentOrder, setCurrentOrder] = useState(new Map());
+  const [currentOrder, setCurrentOrder] = useState({});
 
   const onFragranceSelect = (fragrance) => {
     setCurrentOrder((currentOrder) => {
-      console.log(`Adding ${fragrance} to order`);
-      currentOrder.set(fragrance, 0);
-      for (const [k, v] of currentOrder.entries()) {
-        console.log(k, v);
-      }
-      return currentOrder;
+      console.log(`Adding ${fragrance.label} to order`);
+      return {
+        ...currentOrder,
+        [fragrance.label]: fragrance.value,
+      };
     });
   };
 
   const onFragranceRemove = (fragrance) => {
     setCurrentOrder((currentOrder) => {
-      console.log(`Removing ${fragrance} from order`);
-      currentOrder.delete(fragrance);
-      for (const [k, v] of currentOrder.entries()) {
-        console.log(k, v);
-      }
-      return currentOrder;
+      console.log(`Removing ${fragrance.label} from order`);
+      const clone = Object.assign({}, currentOrder);
+      delete clone[fragrance.label];
+      return clone;
     });
   };
 
   const onFragranceClear = () => {
-    setCurrentOrder(new Map());
+    setCurrentOrder({});
     console.log('Order cleared!');
   };
 
@@ -64,35 +61,50 @@ const App = () => {
     fetchAllFragrances();
   }, []);
 
+  // (naive) form validation methods
+  const StartOrderButton = () => {
+    return Object.keys(currentOrder).length !== 3
+      ? <Button disabled>Start order</Button>
+      : <Button onClick={handleStartOrderOnClick}>Start order</Button>;
+  };
+
+  const OrderCountValidationHeader = () => {
+    const count = Object.keys(currentOrder).length;
+    return count === 0 || count === 3
+      ? null
+      : <p>Please select exactly 3 fragrances.</p>;
+  };
+
   return (
     <div className="App">
       <div id="form-wrapper">
         <div id="inputs">
-          <TextField title="First Name" placeholder="Enter Customer First Name" type="text" size="large">
+          <TextField title="First Name" placeholder="Enter Customer First Name" type="text" size="large" requiredAsterisk>
             Insert your input here.
           </TextField>
-          <TextField title="Last Name" placeholder="Enter Customer Last Name" type="text" size="large">
+          <TextField title="Last Name" placeholder="Enter Customer Last Name" type="text" size="large" requiredAsterisk>
             Insert your input here.
           </TextField>
-          <TextField title="Quantity" placeholder="1" type="number" size="large">
+          <TextField title="Quantity" placeholder="1" type="number" size="large" requiredAsterisk>
             Insert your input here.
           </TextField>
         </div>
+        <OrderCountValidationHeader></OrderCountValidationHeader>
         <div id="dropdown">
-          <Dropdown 
+          <Dropdown
             multi
-            multiline
             clearable
             size="large"
+            dropdownMenuWrapperClassName="dropdown-menu-list"
             onOptionSelect={(option) => onFragranceSelect(option)}
             onOptionRemove={(option) => onFragranceRemove(option)}
             onClear={() => onFragranceClear()}
-            options={formatFragranceOptions()}></Dropdown>
+            options={formatFragranceOptions()}
+          >
+          </Dropdown>
         </div>
         <div id="startOrderButton" size="large">
-          <Button onClick={handleStartOrderOnClick}>
-            Start order
-          </Button>
+          <StartOrderButton></StartOrderButton>
         </div>
       </div>
     </div>

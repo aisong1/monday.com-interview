@@ -27,6 +27,17 @@ body {
   margin-top: 1em;
 }
 
+p {
+  color: red;
+}
+
+/* 
+istg there's a way to do this
+.dropdown-menu-list {
+  margin-bottom: 100px;
+} 
+*/
+
 #startOrderButton {
   margin-top: 1em;
 }
