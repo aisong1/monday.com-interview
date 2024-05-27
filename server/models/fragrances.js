@@ -17,10 +17,10 @@ module.exports = {
   },
   create: async ({ name, description, category, image_url }) => {
     try {
-      const id = uuid();
+      const fragranceId = uuid();
 
       const sql = 'INSERT INTO `fragrances`(`id`, `name`, `description`, `category`, `image_url`) VALUES (?, ?, ?, ?, ?)';
-      const values = [id, name, description, category, image_url];
+      const values = [fragranceId, name, description, category, image_url];
 
       const [results] = await db.connection.execute(sql, values);
 
