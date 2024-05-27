@@ -17,8 +17,4 @@ router.get('/orders', controller.orders.get);
 
 router.post('/orders', controller.orders.post);
 
-router.put('/orders', controller.orders.put);
-
-router.delete('/orders', controller.orders.delete);
-
 module.exports = router;
