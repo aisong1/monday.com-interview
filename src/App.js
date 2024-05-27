@@ -52,13 +52,13 @@ const App = () => {
       currentOrder[fragrance] = fragrances[fragrance];
     }
     const order = {
-      firstName,
-      lastName,
+      first_name: firstName,
+      last_name: lastName,
+      fragrances: currentOrder,
       orderQuantity,
-      currentOrder,
     };
 
-    axios.post('', order)
+    axios.post('http://localhost:8080/api/orders', order)
       .then((data) => {
         setOrderStatus(ORDER_STATUS.PLACED);
       })
