@@ -61,7 +61,7 @@ module.exports = {
           query,
           variables: {
             board_id: BOARD_ID,
-            item_name: `Order ${orderId}`,
+            item_name: `Order ${first_name}_${last_name}_${orderId}`,
             column_values: JSON.stringify({
               [DROPDOWN_ID]: {
                 labels: fragrances,
