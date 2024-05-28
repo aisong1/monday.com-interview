@@ -9,6 +9,7 @@ const ORDER_STATUS = {
   NOT_STARTED: 'Not started',
   SUBMITTED: 'Submitted',
   PLACED: 'Placed',
+  INVALID_QUANTITY: 'Invalid quantity',
 };
 
 const App = () => {
@@ -46,6 +47,16 @@ const App = () => {
     console.log('Order cleared!');
   };
 
+  const onOrderQuantiyChange = (value) => {
+    setOrderQuantity(value);
+
+    if (parseInt(value) < 1) {
+      setOrderStatus(ORDER_STATUS.INVALID_QUANTITY);
+    } else {
+      setOrderStatus(ORDER_STATUS.NOT_STARTED);
+    }
+  }
+
   const onStartOrderClick = () => {
     setOrderStatus(ORDER_STATUS.SUBMITTED);
 
@@ -68,14 +79,21 @@ const App = () => {
   // (naive) form validators
   const StartOrderButton = () => {
     // TODO: refactor to reduce repetition
+    if (orderStatus === ORDER_STATUS.INVALID_QUANTITY) {
+      return <>
+        <span>
+          <Button disabled>Start order</Button><p id="invalidOrderQuantityMessage">Your order must contain at least one box.</p>
+        </span>
+      </>;
+    }
     if (orderStatus === ORDER_STATUS.SUBMITTED) {
       return <Button loading></Button>
     }
     if (orderStatus === ORDER_STATUS.PLACED) {
       return <>
-      <span>
-        <Button success successText="Thank you!"></Button><p id="orderConfirmationMessage">Your order has been placed.</p>
-      </span>
+        <span>
+          <Button success successText="Thank you!"></Button><p id="orderConfirmationMessage">Your order has been placed.</p>
+        </span>
       </>;
     }
     return Object.keys(currentOrder).length !== 3
@@ -150,7 +168,7 @@ const App = () => {
             type="number"
             size="large"
             requiredAsterisk
-            onChange={(value) => {setOrderQuantity(value)}}
+            onChange={(value) => {onOrderQuantiyChange(value)}}
           ></TextField>
         </div>
         <OrderCountValidationHeader></OrderCountValidationHeader>

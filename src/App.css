@@ -31,7 +31,7 @@ body {
   color: red;
 }
 
-#orderConfirmationMessage {
+#orderConfirmationMessage, #invalidOrderQuantityMessage {
   color: gray;
   margin-left: 10px;
   display: inline;
