@@ -21,11 +21,7 @@ module.exports = {
   // idempotent
   put: async (req, res) => {
     try {
-      const results = await models.fragrances.update(
-        req.query?.id,
-        ...Object.keys(req.body),
-        ...Object.values(req.body),
-      );
+      const results = await models.fragrances.update(req.body, req.query.id);
       res.send(JSON.stringify(results));
     } catch (err) {
       throw new Error(err);

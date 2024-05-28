@@ -30,11 +30,20 @@ module.exports = {
       console.log(err);
     }
   },
-  // is this expected to update n number of columns at once? or just one column at a time?
-  update: async (id, column, value) => {
+  update: async (body, id) => {
     try {
-      const sql = 'UPDATE `fragrances` SET `' + column + '` = ? WHERE `id` = ?';
-      const values = [value, id];
+      const columnsToSet = Object.keys(body);
+      const valuesToSet = Object.values(body);
+      let setStatement = '';
+
+      for (const col of columnsToSet) {
+        setStatement += `\`${col}\` = ?, `;
+      }
+      // remove leftover comma and space
+      setStatement = setStatement.substring(0, setStatement.length - 2);
+
+      const sql = 'UPDATE `fragrances` SET ' + setStatement +' WHERE `id` = ?';
+      const values = [...valuesToSet, id];
 
       const [results] = await db.connection.execute(sql, values);
       
