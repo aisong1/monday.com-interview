@@ -8,7 +8,7 @@ if (!AUTH_TOKEN) {
 
 const client = axios.create({
   baseURL: 'https://api.monday.com/v2',
-  timeout: 1000,
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
     'Authorization': AUTH_TOKEN,

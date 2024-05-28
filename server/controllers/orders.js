@@ -6,16 +6,17 @@ module.exports = {
       const results = await models.orders.query();
       res.send(JSON.stringify(results));
     } catch (err) {
-      throw new Error(err);
+      throw err;
     }
   },
   post: async (req, res) => {
     try {
       const results = await models.orders.create(req.body);
+      console.debug(results);
       res.status(201);
-      res.send(JSON.stringify(results));
+      res.end();
     } catch (err) {
-      throw new Error(err);
+      throw err;
     }
   },
 };
