@@ -48,13 +48,11 @@ const App = () => {
 
   const onStartOrderClick = () => {
     setOrderStatus(ORDER_STATUS.SUBMITTED);
-    for (const fragrance of Object.keys(currentOrder)) {
-      currentOrder[fragrance] = fragrances[fragrance];
-    }
+
     const order = {
       first_name: firstName,
       last_name: lastName,
-      fragrances: currentOrder,
+      fragrances: Object.keys(currentOrder),
       orderQuantity,
     };
 
@@ -71,10 +69,14 @@ const App = () => {
   const StartOrderButton = () => {
     // TODO: refactor to reduce repetition
     if (orderStatus === ORDER_STATUS.SUBMITTED) {
-      return <Button loading>Processing...</Button>
+      return <Button loading></Button>
     }
     if (orderStatus === ORDER_STATUS.PLACED) {
-      return <Button success successText="Your order has been placed!"></Button>
+      return <>
+      <span>
+        <Button success successText="Thank you!"></Button><p id="orderConfirmationMessage">Your order has been placed.</p>
+      </span>
+      </>;
     }
     return Object.keys(currentOrder).length !== 3
       ? <Button disabled>Start order</Button>
@@ -85,7 +87,7 @@ const App = () => {
     const count = Object.keys(currentOrder).length;
     return count === 0 || count === 3
       ? null
-      : <p>Please select exactly 3 fragrances.</p>;
+      : <p id="fragranceNumberValidationMessage">Please select exactly 3 fragrances.</p>;
   };
 
   // data fetching and formatting
