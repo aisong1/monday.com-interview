@@ -1,45 +1,58 @@
 ## Overview
-This is the "Quickstart React" example Monday app. 
-<br>It can be used as a board view or dashboard widget, connected to a board and render data from the board using settings.
-
-<br>This app demonstrates how to use: 
-- [settings](https://github.com/mondaycom/monday-sdk-js#mondaygettype-params--) 
-- [context](https://github.com/mondaycom/monday-sdk-js#mondaygettype-params--) 
-- [API](https://github.com/mondaycom/monday-sdk-js#mondayapiquery-options--)
-
-<br>You can find more info in our QuickStart guide [here](https://monday.com/developers/apps/quickstart-view/)
-<br /> ![Screenshot](https://dapulse-res.cloudinary.com/image/upload/w_900/v1591485466/remote_mondaycom_static/developers/screenshots/final_view.gif)
+This app allows consumers to place candle orders. These orders are added to an Orders board in Monday.com upon placement.
 
 ## Run the project
 
-In the project directory, you should run:
+### Pre-requesites
+This project requires MYSQL to be installed locally. You can either
+1. Use [homebrew](https://formulae.brew.sh/formula/mysql) (recommended), or
+2. Install the MYSQL package [directly onto your system](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
 
-### `npm install`
+Once installed, a user of name "root" will be automatically created, without a password. Leave it without a password.
 
-And then to run an application with the monday tunnel, run:
+As a sanity check, start up your MYSQL server.
+``` sh
+### homebrew
+brew services start mysql
 
-### `npm start`
+### Direct system install
+mysql.server start
+```
 
-Find the provided URL in your terminal. This is your public URL, and you can use it to test your application.
-Example: https://abcd12345.apps-tunnel.monday.com
+After you confirm that MYSQL is installed successfully, create the `fragrances` table by running
+``` sh
+mysql -u root < server/db/schema.sql
+```
+If successful, you should see no output from the terminal.
 
-## Configure Monday App 
+### Install project dependencies
+Install all project dependencies with
+``` sh
+npm install
+```
 
-1. Open monday.com, login to your account and go to a "Developers" section.
-2. Create a new "QuickStart View Example App"
-3. Open "OAuth & Permissions" section and add "boards:read" scope
-4. Open "Features" section and create a new "Boards View" feature
-5. Open "View setup" tab and fulfill in "Custom URL" field your monday tunnel public URL, which you got previously (example: https://abcd12345.apps-tunnel.monday.com)
-6. Click "Boards" button and choose one of the boards with some data in it.
-7. Click "Preview button"
-8. Enjoy the Quickstart View Example app!
+### Configure environment variables
+Export the following **required** environment variables.
 
-## Release your app
-1. Run script
-### `npm run build`
-2. Zip your "./build" folder
-3. Open "Build" tab in your Feature
-4. Click "New Build" button
-5. Click "Upload" radio button and upload zip file with your build
-6. Go to any board and add your just released view
-7. Enjoy!
+``` sh
+export AUTH_TOKEN=MONDAY.COM_API_TOKEN; # Your Monday.com developer auth token
+export BOARD_ID=TARGET_BOARD_ID;        # The ID of the target Orders board
+export DROPDOWN_ID=TARGET_DROPDOWN_ID;  # The column ID of the dropdown menu where fragrances will be listed per order
+```
+
+### Starting the backend server
+This app runs a simple Express server for its backend. Start the server with
+``` sh
+npm run backend
+```
+A local server will now be running at `http://localhost:8080`.
+
+### Running the app
+With the backend server running, start up the app by running
+``` sh
+npm start
+```
+This command will run the app in two places: on Monday.com servers & on your localhost.
+View the app by navigating to the Monday.com URL displayed in the terminal or by navigating to `http://localhost:8301`.
+
+Enter your first name, last name, the amount of candle boxes you'd like to order, and select exactly three fragrances. Hit "Start order" to place an order and watch it appear on your Orders board! 🎉
