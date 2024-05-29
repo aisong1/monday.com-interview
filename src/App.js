@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "monday-ui-react-core/dist/main.css";
 import { Button, Dropdown, TextField } from "monday-ui-react-core";
@@ -12,38 +12,51 @@ const ORDER_STATUS = {
   INVALID_QUANTITY: 'Invalid quantity',
 };
 
+const dropdownMenuOptionHeightPx = 30.5;
+const dropdownMenuInnerPadding = 8;
+const dropdownMenuOuterMargin = 16;
+
 const App = () => {
   const [fragrances, setFragrances] = useState({});
-  const [currentOrder, setCurrentOrder] = useState({});
+  const currentOrderRef = useRef([]);
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [orderQuantity, setOrderQuantity] = useState(0);
+  const [orderQuantity, setOrderQuantity] = useState('');
 
   const [orderStatus, setOrderStatus] = useState(ORDER_STATUS.NOT_STARTED);
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownHeight, setDropdownHeight] = useState(0);
+
+  const calculateCurrentDropdownMenuHeight = () => {
+    // The current height of the dropdown is the total number of fragrances
+    // deducted by the number of the fragrances the user currently has selected,
+    // multipled by height of each option text, summed with the inner padding 
+    // and outer margin height of the dropdown menu element itself.
+    const currentDropdownHeight = 
+      ((Object.keys(fragrances).length - currentOrderRef.current.length) * dropdownMenuOptionHeightPx) 
+        + dropdownMenuInnerPadding + dropdownMenuOuterMargin;
+
+    return currentDropdownHeight;
+  }
+
   // event listeners
   const onFragranceSelect = (fragrance) => {
-    setCurrentOrder((currentOrder) => {
-      console.log(`Adding ${fragrance.label} to order`);
-      return {
-        ...currentOrder,
-        [fragrance.label]: fragrance.value,
-      };
-    });
+    console.log(`Adding ${fragrance.label} to order`);
+    currentOrderRef.current.push(fragrance.label);
+    setDropdownHeight(calculateCurrentDropdownMenuHeight());
   };
 
   const onFragranceRemove = (fragrance) => {
-    setCurrentOrder((currentOrder) => {
-      console.log(`Removing ${fragrance.label} from order`);
-      const clone = Object.assign({}, currentOrder);
-      delete clone[fragrance.label];
-      return clone;
-    });
+    console.log(`Removing ${fragrance.label} from order`);
+    const index = currentOrderRef.current.findIndex((element) => element === fragrance.label);
+    currentOrderRef.current.splice(index, 1);
+    setDropdownHeight(calculateCurrentDropdownMenuHeight());
   };
 
   const onFragranceClear = () => {
-    setCurrentOrder({});
+    currentOrderRef.current = [];
     console.log('Order cleared!');
   };
 
@@ -57,27 +70,26 @@ const App = () => {
     }
   }
 
-  const onStartOrderClick = () => {
-    setOrderStatus(ORDER_STATUS.SUBMITTED);
-
-    const order = {
-      first_name: firstName,
-      last_name: lastName,
-      fragrances: Object.keys(currentOrder),
-      orderQuantity,
-    };
-
-    axios.post('http://localhost:8080/api/orders', order)
-      .then((data) => {
-        setOrderStatus(ORDER_STATUS.PLACED);
-      })
-      .catch((err) => {
-        throw err;
-      });
+  const onMenuOpen = () => {
+    setDropdownHeight(calculateCurrentDropdownMenuHeight());
+    setIsDropdownOpen(true);
   };
 
-  // (naive) form validators
+  const onMenuClose = () => {
+    setIsDropdownOpen(false);
+  };
+
+  // (naive) form stylers/validators
+  let size = 'large';
   let disabled, loading, success, successText, onClick, message;
+
+  const isValidOrder = () => {
+    return currentOrderRef.current.length === 3
+      && firstName !== ''
+        && lastName !== ''
+          && Number.isInteger(parseInt(orderQuantity));
+  };
+
   const StartOrderButton = () => {
     switch (orderStatus) {
       case ORDER_STATUS.INVALID_QUANTITY:
@@ -93,10 +105,10 @@ const App = () => {
         message = <p id="orderConfirmationMessage">Your order has been placed.</p>;
         break;
       default:
-        if (Object.keys(currentOrder).length !== 3) {
-          disabled = true;
-        } else {
+        if (isValidOrder()) {
           onClick = onStartOrderClick;
+        } else {
+          disabled = true;
         }
         break;
     }
@@ -109,6 +121,7 @@ const App = () => {
           success={success}
           successText={successText}
           onClick={onClick}
+          size={size}
         >
           Start order
         </Button>{message}
@@ -117,7 +130,7 @@ const App = () => {
   };
 
   const OrderCountValidationHeader = () => {
-    const count = Object.keys(currentOrder).length;
+    const count = currentOrderRef.current.length;
     return count === 0 || count === 3
       ? null
       : <p id="fragranceNumberValidationMessage">Please select exactly 3 fragrances.</p>;
@@ -153,6 +166,25 @@ const App = () => {
     return options;
   }
 
+  const onStartOrderClick = () => {
+    setOrderStatus(ORDER_STATUS.SUBMITTED);
+
+    const order = {
+      first_name: firstName,
+      last_name: lastName,
+      fragrances: currentOrderRef.current,
+      orderQuantity,
+    };
+
+    axios.post('http://localhost:8080/api/orders', order)
+      .then((data) => {
+        setOrderStatus(ORDER_STATUS.PLACED);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  };
+
   useEffect(() => {
     fetchAllFragrances();
   }, []);
@@ -165,7 +197,7 @@ const App = () => {
             title="First Name"
             placeholder="Enter Customer First Name"
             type="text"
-            size="large"
+            size={size}
             requiredAsterisk
             onChange={(value) => {setFirstName(value)}}
           ></TextField>
@@ -173,15 +205,15 @@ const App = () => {
             title="Last Name"
             placeholder="Enter Customer Last Name"
             type="text"
-            size="large"
+            size={size}
             requiredAsterisk
             onChange={(value) => {setLastName(value)}}
           ></TextField>
           <TextField
             title="Quantity"
-            placeholder="1"
+            placeholder="0"
             type="number"
-            size="large"
+            size={size}
             requiredAsterisk
             onChange={(value) => {onOrderQuantityChange(value)}}
           ></TextField>
@@ -191,16 +223,18 @@ const App = () => {
           <Dropdown
             multi
             clearable
-            size="large"
+            size={size}
             dropdownMenuWrapperClassName="dropdown-menu-list"
             onOptionSelect={(option) => onFragranceSelect(option)}
             onOptionRemove={(option) => onFragranceRemove(option)}
             onClear={() => onFragranceClear()}
             options={formatFragranceOptions()}
+            onMenuOpen={() => onMenuOpen()}
+            onMenuClose={() => onMenuClose()}
           >
           </Dropdown>
         </div>
-        <div id="startOrderButton" size="large">
+        <div id="startOrderButton" style={{ marginTop: isDropdownOpen ? `${dropdownHeight}px` : '1em', transition: 'margin-top 0.3s ease' }}>
           <StartOrderButton></StartOrderButton>
         </div>
       </div>
