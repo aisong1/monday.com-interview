@@ -56,3 +56,49 @@ This command will run the app in two places: on Monday.com servers & on your loc
 View the app by navigating to the Monday.com URL displayed in the terminal or by navigating to `http://localhost:8301`.
 
 Enter your first name, last name, the amount of candle boxes you'd like to order, and select exactly three fragrances. Hit "Start order" to place an order and watch it appear on your Orders board! 🎉
+
+## `/api/fragrance`
+Copy and paste the following cURL commands directly into terminal or into Postman to test the fragrance API.
+
+### Create a fragrance (POST)
+Creates a fragrance. Required fields:
+- Name
+- Description
+- Category
+- Image URL
+
+``` sh
+curl --location 'localhost:8080/api/fragrances' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "Fresh Laundry",
+    "description": "For that classic Downey scent.",
+    "category": "Fresh",
+    "image_url": "https://example.com/fresh_laundry.jpg"
+}'
+```
+
+### Get all fragrances (GET)
+Fetches a list of all fragrances. Response includes fragrance IDs.
+``` sh
+curl --location 'localhost:8080/api/fragrances'
+```
+_A fragrance **must** be referenced by its ID when performing update and delete operations._
+
+
+### Update a fragrance (PUT)
+Updates details for a single fragrance. Request body can contain any number of valid, existing columns to update.
+``` sh
+curl --location --request PUT 'localhost:8080/api/fragrances?id=<FRAGRANCE_ID>' \
+--header 'Content-Type: application/json' \
+--data '{
+   "description": "foo",
+   "category": "bar"
+}'
+```
+
+### Delete a fragrance (DELETE)
+Deletes a single fragrance.
+``` sh
+curl --location --request DELETE 'localhost:8080/api/fragrances?id=<FRAGRANCE_ID>'
+```
