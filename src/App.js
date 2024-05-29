@@ -47,7 +47,7 @@ const App = () => {
     console.log('Order cleared!');
   };
 
-  const onOrderQuantiyChange = (value) => {
+  const onOrderQuantityChange = (value) => {
     setOrderQuantity(value);
 
     if (parseInt(value) < 1) {
@@ -77,28 +77,43 @@ const App = () => {
   };
 
   // (naive) form validators
+  let disabled, loading, success, successText, onClick, message;
   const StartOrderButton = () => {
-    // TODO: refactor to reduce repetition
-    if (orderStatus === ORDER_STATUS.INVALID_QUANTITY) {
-      return <>
-        <span>
-          <Button disabled>Start order</Button><p id="invalidOrderQuantityMessage">Your order must contain at least one box.</p>
-        </span>
-      </>;
+    switch (orderStatus) {
+      case ORDER_STATUS.INVALID_QUANTITY:
+        disabled = true;
+        message = <p id="invalidOrderQuantityMessage">Your order must contain at least one box.</p>
+        break;
+      case ORDER_STATUS.SUBMITTED:
+        loading = true;
+        break;
+      case ORDER_STATUS.PLACED:
+        success = true;
+        successText = 'Thank you!';
+        message = <p id="orderConfirmationMessage">Your order has been placed.</p>;
+        break;
+      default:
+        if (Object.keys(currentOrder).length !== 3) {
+          disabled = true;
+        } else {
+          onClick = onStartOrderClick;
+        }
+        break;
     }
-    if (orderStatus === ORDER_STATUS.SUBMITTED) {
-      return <Button loading></Button>
-    }
-    if (orderStatus === ORDER_STATUS.PLACED) {
-      return <>
-        <span>
-          <Button success successText="Thank you!"></Button><p id="orderConfirmationMessage">Your order has been placed.</p>
-        </span>
-      </>;
-    }
-    return Object.keys(currentOrder).length !== 3
-      ? <Button disabled>Start order</Button>
-      : <Button onClick={onStartOrderClick}>Start order</Button>;
+
+    return <>
+      <span>
+        <Button
+          disabled={disabled}
+          loading={loading}
+          success={success}
+          successText={successText}
+          onClick={onClick}
+        >
+          Start order
+        </Button>{message}
+      </span>
+    </>;
   };
 
   const OrderCountValidationHeader = () => {
@@ -168,7 +183,7 @@ const App = () => {
             type="number"
             size="large"
             requiredAsterisk
-            onChange={(value) => {onOrderQuantiyChange(value)}}
+            onChange={(value) => {onOrderQuantityChange(value)}}
           ></TextField>
         </div>
         <OrderCountValidationHeader></OrderCountValidationHeader>

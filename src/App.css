@@ -9,6 +9,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: white;
 }
 
 #form-wrapper {
@@ -37,17 +38,11 @@ body {
   display: inline;
 }
 
-/* 
-istg there's a way to do this
-.dropdown-menu-list {
-  margin-bottom: 100px;
-} 
-*/
-
 #startOrderButton {
   margin-top: 1em;
 }
 
 Button {
   width: 45%;
+  justify-content: left !important;
 }
